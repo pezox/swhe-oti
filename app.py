@@ -22,7 +22,7 @@ def parse_swhe_params(file_path):
     
     sk = int(swhe_data['sk'])
     
-    plaintext_vector = data['Plaintext Vector']
+    #plaintext_vector = data['Plaintext Vector']
     
     return {
         'eta': eta,
@@ -30,8 +30,7 @@ def parse_swhe_params(file_path):
         'rho': rho,
         'tau': tau,
         'pk': pk,
-        'sk': sk,
-        'plaintext_vector': plaintext_vector
+        'sk': sk
     }
 
 def parse_plaintext_vector(file_path):
@@ -120,7 +119,7 @@ def decrypt(sk, c):
     Returns:
       Decrypted bit (0 or 1).
     """
-    # Compute (c mod p) mod 2
+    # Compute (c mod p) mod 2, where the value of p is from the variable sk
     c_mod_sk = mod_p(c, sk)
     decrypted_message = mod_p(c_mod_sk, 2)
     return decrypted_message
@@ -153,6 +152,75 @@ def homomorphic_and(c1, c2, x0):
     """
     return mod_p(c1 * c2, x0)
 
+def test_operations(ciphertext, sk, x0, max_iterations=100):
+    """
+    Test the number of supported XOR and AND operations before decryption fails.
+    
+    Args:
+      ciphertext: The starting ciphertext (integer).
+      sk: Secret key (integer).
+      x0: First element of the public key (integer).
+      max_iterations: Maximum number of operations to attempt.
+    
+    Returns:
+      num_xor: Number of successful XOR operations before failure.
+      num_and: Number of successful AND operations before failure.
+    """
+    original_message = decrypt(sk, ciphertext)
+    
+    # Test XOR operations
+    current_ct_xor = ciphertext
+    num_xor = 0
+    for _ in range(max_iterations):
+        current_ct_xor = homomorphic_xor(current_ct_xor, ciphertext, x0)
+        if decrypt(sk, current_ct_xor) != original_message:
+            break
+        num_xor += 1
+    
+    # Test AND operations
+    current_ct_and = ciphertext
+    num_and = 0
+    for _ in range(max_iterations):
+        current_ct_and = homomorphic_and(current_ct_and, ciphertext, x0)
+        if decrypt(sk, current_ct_and) != original_message:
+            break
+        num_and += 1
+    
+    return num_xor, num_and
+
+def run_task1(json_file_path):
+    return 1 # TODO move code related to task 1 here
+
+def run_task2(json_file_path):
+    """
+    For each ciphertext, evaluates the number of supported
+    XOR and AND operations as described in Section 2.2.
+    States for each noise level and for both operations
+    the number of supported iterations using the parameters
+    for the scheme stated in the JSON file.
+    """
+    parsed_swhe_params = parse_swhe_params(json_file_path)
+
+    pk = parsed_swhe_params['pk']
+    sk = parsed_swhe_params['sk']
+
+    ciphertext_collection = parse_ciphertext_collection(json_file_path)
+
+    # x0 is the first element of the public key
+    x0 = int(pk[0])
+
+    # Iterate through the ciphertexts and test each one
+    for i, ct in enumerate(ciphertext_collection):
+        ciphertext = int(ct["Ciphertext"])
+        noise_bitlength = ct["Noise Bitlength"]
+    
+        num_xor, num_and = test_operations(ciphertext, sk, x0, 200000)
+        
+        print(f"Ciphertext {i + 1} (Noise Bitlength: {noise_bitlength}) supports:")
+        print(f"  XOR operations: {num_xor}")
+        print(f"  AND operations: {num_and}")
+    return
+
 def main():
     json_file_path = 'input/swhe-task1.json'
     parsed_swhe_params = parse_swhe_params(json_file_path)
@@ -166,17 +234,17 @@ def main():
 
     plaintext_vector = parse_plaintext_vector(json_file_path)
 
-    print(f"eta: {eta}, gamma: {gamma}, rho: {rho}, tau: {tau}")
-    print(f"Public key (pk): {pk}")
-    print(f"Secret key (sk): {sk}")
-    print(f"Plaintext vector: {plaintext_vector}")
+    #print(f"eta: {eta}, gamma: {gamma}, rho: {rho}, tau: {tau}")
+    #print(f"Public key (pk): {pk}")
+    #print(f"Secret key (sk): {sk}")
+    #print(f"Plaintext vector: {plaintext_vector}")
 
     # Encrypt the plaintext vector
-    encrypted_vector = encrypt_vector(plaintext_vector, pk, rho, tau)
-    print(f"Encrypted vector: {encrypted_vector}")
+    #encrypted_vector = encrypt_vector(plaintext_vector, pk, rho, tau)
+    #print(f"Encrypted vector: {encrypted_vector}")
     # TODO print the encrypted vector to the json file
 
-
+    run_task2('input/swhe-task2.json')
 
 
 if __name__ == '__main__':
