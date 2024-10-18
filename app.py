@@ -47,6 +47,10 @@ def parse_ciphertext_collection(file_path):
     """
     Parses the ciphertext collection from the given file.
     """
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    
+    return data['Ciphertext Collection']
 
 def q_p(z, p):
     """
@@ -104,6 +108,50 @@ def encrypt_vector(plaintext_vector, pk, rho, tau):
     """
     encrypted_vector = [encrypt_bit(m, pk, rho, tau) for m in plaintext_vector]
     return encrypted_vector
+
+def decrypt(sk, c):
+    """
+    Decrypts a ciphertext c using the secret key sk.
+    
+    Args:
+      sk: Secret key (integer).
+      c: Ciphertext (integer).
+    
+    Returns:
+      Decrypted bit (0 or 1).
+    """
+    # Compute (c mod p) mod 2
+    c_mod_sk = mod_p(c, sk)
+    decrypted_message = mod_p(c_mod_sk, 2)
+    return decrypted_message
+
+def homomorphic_xor(c1, c2, x0):
+    """
+    Perform homomorphic XOR (ciphertext addition) on two ciphertexts.
+    
+    Args:
+      c1: First ciphertext (integer).
+      c2: Second ciphertext (integer).
+      x0: First element of the public key (integer).
+    
+    Returns:
+      Resulting ciphertext after XOR.
+    """
+    return mod_p(c1 + c2, x0)
+
+def homomorphic_and(c1, c2, x0):
+    """
+    Perform homomorphic AND (ciphertext multiplication) on two ciphertexts.
+    
+    Args:
+      c1: First ciphertext (integer).
+      c2: Second ciphertext (integer).
+      x0: First element of the public key (integer).
+    
+    Returns:
+      Resulting ciphertext after AND.
+    """
+    return mod_p(c1 * c2, x0)
 
 def main():
     json_file_path = 'input/swhe-task1.json'
