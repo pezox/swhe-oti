@@ -1,0 +1,46 @@
+{
+  "SWHE": {
+    "Public Parameters": {
+      "eta": "26",
+      "gamma": "32",
+      "rho": "10",
+      "tau": "10",
+      "pk": [
+        "2439723501",
+        "1516584921",
+        "2373784930",
+        "65938157",
+        "197815671",
+        "923138892",
+        "2307847415",
+        "2373784204",
+        "395630460",
+        "1516585081",
+        "1186893202"
+      ]
+    },
+    "sk": "65938473"
+  },
+  "Ciphertext Collection": [
+    {
+      "Noise Bitlength": 1,
+      "Ciphertext": "329693175"
+    },
+    {
+      "Noise Bitlength": 3,
+      "Ciphertext": "395630526"
+    },
+    {
+      "Noise Bitlength": 5,
+      "Ciphertext": "1055018158"
+    },
+    {
+      "Noise Bitlength": 7,
+      "Ciphertext": "989076569"
+    },
+    {
+      "Noise Bitlength": 9,
+      "Ciphertext": "791262110"
+    }
+  ]
+}
