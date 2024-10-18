@@ -1,5 +1,4 @@
 import json
-import math
 import random
 
 def parse_swhe_params(file_path):
