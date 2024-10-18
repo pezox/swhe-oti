@@ -22,8 +22,6 @@ def parse_swhe_params(file_path):
     
     sk = int(swhe_data['sk'])
     
-    #plaintext_vector = data['Plaintext Vector']
-    
     return {
         'eta': eta,
         'gamma': gamma,
@@ -50,6 +48,23 @@ def parse_ciphertext_collection(file_path):
         data = json.load(file)
     
     return data['Ciphertext Collection']
+
+def write_encrypted_vector_to_file(file_path, encrypted_vector):
+    """
+    Adds the result to the JSON file under the key Encrypted Vector
+    following the notation as used for the plaintext vector.
+    """
+    with open(file_path, "r") as file:
+        data = json.load(file)
+
+    # Add the encrypted vector to the JSON under the key 'Encrypted Vector'
+    data["Encrypted Vector"] = encrypted_vector
+
+    # Save the updated JSON file as 'swhe-task1_encrypted.json'
+    with open(file_path, "w") as file:
+        json.dump(data, file, indent=4)
+
+    return
 
 def q_p(z, p):
     """
@@ -189,9 +204,32 @@ def test_operations(ciphertext, sk, x0, max_iterations=100):
     return num_xor, num_and
 
 def run_task1(json_file_path):
-    return 1 # TODO move code related to task 1 here
+    """
+    Encrypts a bit vector bitwise using the provided public key
+    together with the public paramaters given in the JSON file.
+    Adds the result to the JSON file under the key Encrypted Vector
+    following the notation as used for the plaintext vector.
+    """
+    parsed_swhe_params = parse_swhe_params(json_file_path)
+
+    rho = parsed_swhe_params['rho']
+    tau = parsed_swhe_params['tau']
+    pk = parsed_swhe_params['pk']
+
+    plaintext_vector = parse_plaintext_vector(json_file_path)
+
+    # Encrypt the plaintext vector
+    encrypted_vector = encrypt_vector(plaintext_vector, pk, rho, tau)
+
+    # Write the encrypted vector to the JSON file
+    write_encrypted_vector_to_file(json_file_path, encrypted_vector)
+    
+    print("[Task 1] Encrypted vectors added to the JSON file successfully!\n")
+
+    return
 
 def run_task2(json_file_path):
+    # TODO refactor: add max number of iterations here
     """
     For each ciphertext, evaluates the number of supported
     XOR and AND operations as described in Section 2.2.
@@ -209,6 +247,8 @@ def run_task2(json_file_path):
     # x0 is the first element of the public key
     x0 = int(pk[0])
 
+    print("[Task 2] See the number of supported operations below!\n")
+
     # Iterate through the ciphertexts and test each one
     for i, ct in enumerate(ciphertext_collection):
         ciphertext = int(ct["Ciphertext"])
@@ -222,30 +262,8 @@ def run_task2(json_file_path):
     return
 
 def main():
-    json_file_path = 'input/swhe-task1.json'
-    parsed_swhe_params = parse_swhe_params(json_file_path)
-
-    eta = parsed_swhe_params['eta']
-    gamma = parsed_swhe_params['gamma']
-    rho = parsed_swhe_params['rho']
-    tau = parsed_swhe_params['tau']
-    pk = parsed_swhe_params['pk']
-    sk = parsed_swhe_params['sk']
-
-    plaintext_vector = parse_plaintext_vector(json_file_path)
-
-    #print(f"eta: {eta}, gamma: {gamma}, rho: {rho}, tau: {tau}")
-    #print(f"Public key (pk): {pk}")
-    #print(f"Secret key (sk): {sk}")
-    #print(f"Plaintext vector: {plaintext_vector}")
-
-    # Encrypt the plaintext vector
-    #encrypted_vector = encrypt_vector(plaintext_vector, pk, rho, tau)
-    #print(f"Encrypted vector: {encrypted_vector}")
-    # TODO print the encrypted vector to the json file
-
+    run_task1('input/swhe-task1.json')
     run_task2('input/swhe-task2.json')
-
 
 if __name__ == '__main__':
    main()
