@@ -227,8 +227,7 @@ def run_task1(json_file_path):
 
     return
 
-def run_task2(json_file_path):
-    # TODO refactor: add max number of iterations here
+def run_task2(json_file_path, max_iterations = 200000):
     """
     For each ciphertext, evaluates the number of supported
     XOR and AND operations as described in Section 2.2.
@@ -246,14 +245,14 @@ def run_task2(json_file_path):
     # x0 is the first element of the public key
     x0 = int(pk[0])
 
-    print("[Task 2] See the number of supported operations below!\n")
+    print("[Task 2] See the number of supported operations below!")
 
     # Iterate through the ciphertexts and test each one
     for i, ct in enumerate(ciphertext_collection):
         ciphertext = int(ct["Ciphertext"])
         noise_bitlength = ct["Noise Bitlength"]
     
-        num_xor, num_and = test_operations(ciphertext, sk, x0, 200000)
+        num_xor, num_and = test_operations(ciphertext, sk, x0, max_iterations)
         
         print(f"Ciphertext {i + 1} (Noise Bitlength: {noise_bitlength}) supports:")
         print(f"  XOR operations: {num_xor}")
